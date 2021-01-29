@@ -1,9 +1,10 @@
 #include <TMB.hpp>
 
-template <class Type> Type square(Type x){return x*x;}
+template <class Type>
+Type square(Type x) { return x * x; }
 
-template<class Type>
-Type objective_function<Type>::operator() ()
+template <class Type>
+Type objective_function<Type>::operator()()
 {
   DATA_INTEGER(m)
   DATA_IVECTOR(TT)
@@ -32,24 +33,23 @@ Type objective_function<Type>::operator() ()
   // End of the temporary variables
 
   // Transform the parameters
-  R0 = B0/Phi0;
+  R0 = B0 / Phi0;
   tau = exp(log_tau);
   SigR = exp(log_sigR);
 
   obj_fun = 0;
- for (int k=0;k<m;k++) {
+  for (int k = 0; k < m; k++)
+  {
 
-   // Extract beta and define h
+    // Extract beta and define h
 
-   // Likelihood
-   }
+    // Likelihood
+  }
 
-
-
-  obj_fun += dummy*dummy;
+  obj_fun += dummy * dummy;
   ADREPORT(h);
   ADREPORT(R0);
   ADREPORT(tau);
 
-  return(obj_fun);
+  return (obj_fun);
 }

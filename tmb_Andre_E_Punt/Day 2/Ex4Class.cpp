@@ -1,9 +1,10 @@
 #include <TMB.hpp>
 
-template <class Type> Type square(Type x){return x*x;}
+template <class Type>
+Type square(Type x) { return x * x; }
 
-template<class Type>
-Type objective_function<Type>::operator() ()
+template <class Type>
+Type objective_function<Type>::operator()()
 {
   DATA_INTEGER(Nyear)
   DATA_INTEGER(Nclass)
@@ -29,12 +30,12 @@ Type objective_function<Type>::operator() ()
   PARAMETER_VECTOR(LogFullF);
   PARAMETER_VECTOR(Eps);
 
-  matrix<Type> N(Nyear+Nproj+1,Nclass);
-  matrix<Type> F(Nyear+Nproj,Nclass);
-  matrix<Type> Z(Nyear+Nproj,Nclass);
-  matrix<Type> CAL(Nyear+Nproj,Nclass);
-  vector<Type> CW(Nyear+Nproj);
-  vector<Type> BioPred(Nyear+Nproj);
+  matrix<Type> N(Nyear + Nproj + 1, Nclass);
+  matrix<Type> F(Nyear + Nproj, Nclass);
+  matrix<Type> Z(Nyear + Nproj, Nclass);
+  matrix<Type> CAL(Nyear + Nproj, Nclass);
+  vector<Type> CW(Nyear + Nproj);
+  vector<Type> BioPred(Nyear + Nproj);
 
   Type CALtot;
 
@@ -48,22 +49,22 @@ Type objective_function<Type>::operator() ()
   // =============================
 
   // First set F and Z by size-classs (note that Fproj applies after year Nyear)
-  for (int Iyear=0; Iyear<Nyear+Nproj; Iyear++)
-   for (int Iclass=0;Iclass<Nclass;Iclass++)
+  for (int Iyear = 0; Iyear < Nyear + Nproj; Iyear++)
+    for (int Iclass = 0; Iclass < Nclass; Iclass++)
     {
-
     }
 
   // Now set the N matrix
-  for (int Iclass=0;Iclass<Nclass;Iclass++) N(0,Iclass) = exp(LogNinit(Iclass));
-  for (int Iyear=0;Iyear<Nyear+Nproj;Iyear++)
-   {
+  for (int Iclass = 0; Iclass < Nclass; Iclass++)
+    N(0, Iclass) = exp(LogNinit(Iclass));
+  for (int Iyear = 0; Iyear < Nyear + Nproj; Iyear++)
+  {
     // Catch-at-length
     // Numbers-at-length
 
     // Recruitment (watch for the index for Eps - and N)
-    N(Iyear+1,0) += exp(LogRbar)*exp(Eps[Iyear]);
-   }
+    N(Iyear + 1, 0) += exp(LogRbar) * exp(Eps[Iyear]);
+  }
 
   // Catch Likelihood
   Type SS = 0;
@@ -79,7 +80,7 @@ Type objective_function<Type>::operator() ()
   // Recruitment penalty (include years after Nyear)
   Penal = 0;
 
-  obj_fun = dummy*dummy + LikeCatch+LikeBio+LikeCAL+Penal;
+  obj_fun = dummy * dummy + LikeCatch + LikeBio + LikeCAL + Penal;
 
   // Stuff to report
   REPORT(N);
@@ -90,5 +91,5 @@ Type objective_function<Type>::operator() ()
   REPORT(BioPred);
   REPORT(obj_fun);
 
-  return(obj_fun);
+  return (obj_fun);
 }

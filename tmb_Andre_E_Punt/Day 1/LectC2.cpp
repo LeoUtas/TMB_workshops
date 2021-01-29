@@ -1,19 +1,21 @@
 #include <TMB.hpp>
 
-
-template<class Type>
+template <class Type>
 Type posfun(Type x, Type eps, Type &pen)
 {
-  if ( x >= eps ){
+  if (x >= eps)
+  {
     return x;
-  } else {
-    pen += Type(0.01) * pow(x-eps,2);
-    return eps/(Type(2.0)-x/eps);
+  }
+  else
+  {
+    pen += Type(0.01) * pow(x - eps, 2);
+    return eps / (Type(2.0) - x / eps);
   }
 }
 
-template<class Type>
-Type objective_function<Type>::operator() ()
+template <class Type>
+Type objective_function<Type>::operator()()
 {
   DATA_VECTOR(C);
   DATA_VECTOR(I);
@@ -36,13 +38,13 @@ Type objective_function<Type>::operator() ()
   vector<Type> ExpOut(n);
   Type f;
   B(0) = k;
-  for(int t=0; t<n; t++)
+  for (int t = 0; t < n; t++)
   {
-    Type Expl = 1.0/(1.0+exp(-FF(t)));
-    B(t+1) = B(t) + r*B(t)*(1-B(t)/k) - Expl*B(t);
-    Chat(t) = Expl*B(t);
+    Type Expl = 1.0 / (1.0 + exp(-FF(t)));
+    B(t + 1) = B(t) + r * B(t) * (1 - B(t) / k) - Expl * B(t);
+    Chat(t) = Expl * B(t);
     ExpOut(t) = Expl;
-    Ihat(t) = q*B(t);
+    Ihat(t) = q * B(t);
   }
   f = -sum(dnorm(log(C), log(Chat), Type(0.05), true));
   f -= sum(dnorm(log(I), log(Ihat), sigma, true));
@@ -52,15 +54,12 @@ Type objective_function<Type>::operator() ()
   ADREPORT(log(B)); // uncertainty
   REPORT(f);        // plot
   REPORT(B);        // plot
-  REPORT(Chat);        // plot
-  REPORT(ExpOut);        // plot
+  REPORT(Chat);     // plot
+  REPORT(ExpOut);   // plot
   REPORT(Ihat);     // plot
 
   return f;
 }
-
-
-
 
 // dvariable posfun(const dvariable&x,const double eps,dvariable& pen)
 //     {
@@ -70,5 +69,3 @@ Type objective_function<Type>::operator() ()
 //         pen+=.01*square(x-eps);
 //         return eps/(2-x/eps);
 // } }
-
-

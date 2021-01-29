@@ -1,7 +1,7 @@
 #include <TMB.hpp>
 
-template<class Type>
-Type objective_function<Type>::operator() ()
+template <class Type>
+Type objective_function<Type>::operator()()
 {
   DATA_VECTOR(x);
   DATA_VECTOR(y);
@@ -16,16 +16,18 @@ Type objective_function<Type>::operator() ()
 
   Type neglogL = 0.0;
 
-  yfit = b0 + b1*x;
+  yfit = b0 + b1 * x;
   neglogL = -sum(dnorm(y, yfit, exp(logSigma), true));
-  SIMULATE {
-	for (int i=0;i<n;i++) y(i) = rnorm(yfit(i),exp(logSigma));
-   }
+  SIMULATE
+  {
+    for (int i = 0; i < n; i++)
+      y(i) = rnorm(yfit(i), exp(logSigma));
+  }
 
-  SIMULATE {
-	REPORT(y)
-   }
-
+  SIMULATE
+  {
+    REPORT(y)
+  }
 
   return neglogL;
 }

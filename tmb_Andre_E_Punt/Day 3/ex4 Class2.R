@@ -1,20 +1,20 @@
-setwd("D:\\courses\\FISH 559_20\\TMB Workshop\\In Class Assignments\\Ex4")
+setwd("D:/OneDrive - University of Tasmania/HOANG.Ng84/Education/Hoang.MUN20/Projects/TMB_workshops/tmb_Andre_E_Punt/Day 3")
 
 # =================================================================================================================
 
 MCMC <- function(model,covar,xxx,mult,Nreps=22000,Nburns=2000,Nevery=10)
 {
   library(mvtnorm)
-  
+
   Npars <- length(xxx)
   Nout <- Nreps
   Outputs <- matrix(0,nrow=Nout,ncol=Npars)
   ObjFn <- rep(NA,length=Nout)
-  
+
   # Counters
   ichk <- 0
   jchk <- 0
-  
+
   # Initialize
   Theta <- xxx
   DeltaInit <- 0.1
@@ -23,47 +23,47 @@ MCMC <- function(model,covar,xxx,mult,Nreps=22000,Nburns=2000,Nevery=10)
   gold <- -1*model$fn(Theta)
   print("gold")
   print(gold)
-  
+
   Iout <- 0
   for (Irep in 1:Nreps)
   {
-    
+
     # do for each parameter
     asave <- Theta
     Theta <- rmvnorm(1, mean=asave, sigma=covar*mult)
     g1 <- -1*model$fn(Theta)
     #print(g1)
-    
+
     RND <- log(runif(1,0,1))
     Fnext <- -1*model$fn(Theta)
     if (g1 > gold+RND)
     { gold <- g1; ichk <- ichk+1 }
     else
-    { Theta <- asave; jchk <- jchk + 1 } 
-    
-    if (Irep <= Nburns) 
+    { Theta <- asave; jchk <- jchk + 1 }
+
+    if (Irep <= Nburns)
       if (Irep %% Nevery == 0)
       {
         if (ichk > jchk)
           mult <- mult * 1.05
-        else 
+        else
           mult <- mult * 0.95
         ichk <- 0
         jchk <- 0
-      }  
-    
+      }
+
     # end of current replicate
     if (Irep %% Nevery == 0)
       if (Irep > Nburns)
-      { 
-        Iout <- Iout + 1 
-        Outputs[Iout,] <- Theta 
+      {
+        Iout <- Iout + 1
+        Outputs[Iout,] <- Theta
         ObjFn[Iout] <- gold
       }
-    if (Irep %% 1000 == 0) print(Irep)  
-    
+    if (Irep %% 1000 == 0) print(Irep)
+
   }
-  
+
   Outs <- list()
   Outs$Outs <- Outputs
   Outs$Outs <- Outs$Outs[1:Iout,]
@@ -75,17 +75,17 @@ MCMC <- function(model,covar,xxx,mult,Nreps=22000,Nburns=2000,Nevery=10)
 #################################################
 
 DoMCMCAll <- function(model,VarCo)
- {  
+ {
   library(rstan)
   library(StanHeaders)
   library(tmbstan)
   #library(ggplot2)
-  
+
   # Now consider mcmc sampling (stan)
   mcmcout <- tmbstan(obj=model,iter=20000, chains=1)
   post2 <- extract(mcmcout)
   save(post2,file="post1.RData")
-}  
+}
 
 ################################################################################
 
@@ -102,30 +102,30 @@ MCMCSumm <- function(file,best,Nyear,data,map,parameters)
   Npar <- 1+ length(post2$LogNinit[1,])+length(post2$LogFullF[1,])+length(post2$Eps[1,])
   print(Nsim)
   print(Npar)
-  
+
   # Extract the results from tmbstan into the correct format
   post1 <- matrix(0,nrow=Nsim,ncol=Npar)
   post1[,1] <- post2$LogRbar
   Ioff <- 1
-  for (Ilen in 1:length(post2$LogNinit[1,])) post1[,Ilen+Ioff] <- post2$LogNinit[,Ilen] 
+  for (Ilen in 1:length(post2$LogNinit[1,])) post1[,Ilen+Ioff] <- post2$LogNinit[,Ilen]
   Ioff <- Ioff + length(post2$LogNinit[1,])
   for (Iyear in 1:length(post2$LogFullF[1,])) post1[,Iyear+Ioff] <- post2$LogFullF[,Iyear]
   Ioff <- Ioff + length(post2$LogFullF[1,])
   for (Iyear in 1:length(post2$Eps[1,])) post1[,Iyear+Ioff] <- post2$Eps[,Iyear]
 
   # Good to check (compare with the sdreport)
-  for (II in 1:Npar)  
-   cat(II,best[II],mean(post1[,II]),sd(post1[,II]),"\n") 
-  
+  for (II in 1:Npar)
+   cat(II,best[II],mean(post1[,II]),sd(post1[,II]),"\n")
+
   # Extract biomass and plot
   Biomass <- matrix(0,nrow=Nsim,ncol=Nyear+1)
   for (Isim in 1:Nsim)
-   { xx <- model$fn(post1[Isim,]); Biomass[Isim,] <- model$report()$BioPred[1:(Nyear+1)]; }  
+   { xx <- model$fn(post1[Isim,]); Biomass[Isim,] <- model$report()$BioPred[1:(Nyear+1)]; }
   quant <- matrix(0,nrow=5,ncol=Nyear+1)
   for (Iyear in 1:(Nyear+1))
-   quant[,Iyear] <- quantile(Biomass[,Iyear],probs=c(0.05,0.25,0.5,0.75,0.95))  
+   quant[,Iyear] <- quantile(Biomass[,Iyear],probs=c(0.05,0.25,0.5,0.75,0.95))
   Years <- 1:(Nyear+1)
-  
+
   # Plot of biomass posterior
   ymax <- max(quant)
   plot(Years,quant[3,],xlab="Year",ylab="Biomass",ylim=c(0,ymax),type='l')
@@ -136,16 +136,16 @@ MCMCSumm <- function(file,best,Nyear,data,map,parameters)
   yy <- c(quant[2,],rev(quant[4,]))
   polygon(xx,yy,col="gray90")
   lines(Years,quant[3,],lwd=3,lty=3)
-  
-  # Projection    
+
+  # Projection
   # ==========
   # Now thin (otherwise this is super slow)
   Use <- seq(from=1,to=Nsim,by=10)
   post1 <- post1[Use,]
   Nsim <- length(Use)
-  
+
   Biomass <- matrix(0,nrow=Nsim,ncol=Nyear+20)
-}  
+}
 
 ################################################################################
 
@@ -177,7 +177,7 @@ for(Iclass in 1:Nclass)
  {
   S[Iclass] <- 1.0/(1+exp(-log(19.0)*(Length[Iclass]-S50)/(S95-S50)))
   SurveyS[Iclass] <- 1.0/(1+exp(-log(19.0)*(Length[Iclass]-SS50)/(SS95-SS50)))
- }  
+ }
 
 # Normalize the catcha-at-length data
 for (Iyear in 1:Nyear)
@@ -185,7 +185,7 @@ for (Iyear in 1:Nyear)
   Total <- 0
   for (Iclass in 1:Nclass) Total <- Total + CALObs[Iyear,Iclass]
   for (Iclass in 1:Nclass) CALObs[Iyear,Iclass] = CALObs[Iyear,Iclass]/Total
- }  
+ }
 
 ################################################################################
 # Hint Nproj = 0 for basic estimation
@@ -285,4 +285,3 @@ print(rep)
 # ==========================
 MCMCSumm("post1.RData",model$env$last.par.best,Nyear,data,map,parameters)
 
-  

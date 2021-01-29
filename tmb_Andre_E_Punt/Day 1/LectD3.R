@@ -1,4 +1,4 @@
-setwd("D:\\courses\\FISH 559_20\\TMB Workshop\\Lecture Examples\\")
+setwd("D:/OneDrive - University of Tasmania/HOANG.Ng84/Education/Hoang.MUN20/Projects/TMB_workshops/tmb_Andre_E_Punt/Day 1")
 
 
 

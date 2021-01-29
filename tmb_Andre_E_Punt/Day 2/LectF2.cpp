@@ -1,9 +1,10 @@
 #include <TMB.hpp>
 
-template <class Type> Type square(Type x){return x*x;}
+template <class Type>
+Type square(Type x) { return x * x; }
 
-template<class Type>
-Type objective_function<Type>::operator() ()
+template <class Type>
+Type objective_function<Type>::operator()()
 {
   DATA_VECTOR(Length);
   DATA_VECTOR(Prob);
@@ -26,10 +27,13 @@ Type objective_function<Type>::operator() ()
   Type neglogL;
 
   // prediction
-  for (int II=0;II<n;II++) yfit(II) = 1/(1+exp(-1*log(19)*(Length(II)-A50)/(A95-A50)));
-  for (int II=0;II<n;II++) yfit(II) = log(yfit(II)/(1.0-yfit(II)));
-  for (int II=0;II<n;II++) SS += square(yfit(II)-Prob2(II));
-  neglogL = float(n)*log(Sigma) + SS/(2.0*square(Sigma));
+  for (int II = 0; II < n; II++)
+    yfit(II) = 1 / (1 + exp(-1 * log(19) * (Length(II) - A50) / (A95 - A50)));
+  for (int II = 0; II < n; II++)
+    yfit(II) = log(yfit(II) / (1.0 - yfit(II)));
+  for (int II = 0; II < n; II++)
+    SS += square(yfit(II) - Prob2(II));
+  neglogL = float(n) * log(Sigma) + SS / (2.0 * square(Sigma));
   //std::cout << neglogL << "\n";
 
   return neglogL;

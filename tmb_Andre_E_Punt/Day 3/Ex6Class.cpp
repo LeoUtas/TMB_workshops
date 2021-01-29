@@ -1,19 +1,21 @@
 #include <TMB.hpp>
 
-
-template<class Type>
+template <class Type>
 Type posfun(Type x, Type eps, Type &pen)
 {
-  if ( x >= eps ){
+  if (x >= eps)
+  {
     return x;
-  } else {
-    pen += Type(0.01) * pow(x-eps,2);
-    return eps/(Type(2.0)-x/eps);
+  }
+  else
+  {
+    pen += Type(0.01) * pow(x - eps, 2);
+    return eps / (Type(2.0) - x / eps);
   }
 }
 
-template<class Type>
-Type objective_function<Type>::operator() ()
+template <class Type>
+Type objective_function<Type>::operator()()
 {
   DATA_VECTOR(C);
   DATA_VECTOR(I1);
@@ -45,14 +47,14 @@ Type objective_function<Type>::operator() ()
 
   B(0) = k;
   f = 0;
-  for(int t=0; t<n; t++)
+  for (int t = 0; t < n; t++)
   {
-    Type Expl = 1.0/(1.0+exp(-FF(t)));
-    B(t+1) = B(t) + r*B(t)*(1-B(t)/k) - Expl*B(t);
+    Type Expl = 1.0 / (1.0 + exp(-FF(t)));
+    B(t + 1) = B(t) + r * B(t) * (1 - B(t) / k) - Expl * B(t);
     //if (B(t+1) < 0.01) B(t+1) = 0.001;
-    Chat(t) = Expl*B(t);
+    Chat(t) = Expl * B(t);
     ExpOut(t) = Expl;
-    Ihat1(t) = q1*B(t);
+    Ihat1(t) = q1 * B(t);
   }
   f -= sum(dnorm(log(C), log(Chat), Type(0.05), true));
   f -= sum(dnorm(log(I1), log(Ihat1), sigma, true));
@@ -73,7 +75,3 @@ Type objective_function<Type>::operator() ()
 
   return f;
 }
-
-
-
-
