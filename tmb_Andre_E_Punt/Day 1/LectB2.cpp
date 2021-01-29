@@ -1,23 +1,24 @@
 #include <TMB.hpp>
 
-template<class Type>
-Type objective_function<Type>::operator() ()
+template <class Type>
+Type objective_function<Type>::operator()()
 {
-  DATA_VECTOR(x);
-  DATA_VECTOR(y);
-  int n = y.size();
+  DATA_VECTOR(x_obs);
+  DATA_VECTOR(y_obs);
+  int n = y_obs.size();
 
   PARAMETER(b0);
   PARAMETER(b1);
   PARAMETER(logSigma);
-  vector<Type> yfit(n);
+  vector<Type> y_pred(n);
+
+  Type nll = 0.0;
+
+  y_obs = b0 + b1 * x_obs;
+  nll -= dnorm(y_obs, y_pred, exp(logSigma), true).sum();
 
   REPORT(b0);
-
-  Type neglogL = 0.0;
-
-  yfit = b0 + b1*x;
-  neglogL = -sum(dnorm(y, yfit, exp(logSigma), true));
-
-  return neglogL;
+  REPORT(b1);
+  REPORT(nll);
+  return nll;
 }
